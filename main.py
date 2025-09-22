@@ -2,11 +2,20 @@ import os
 import sys
 from dotenv import load_dotenv
 from google import genai
+from google.genai import types
 
 # Global Variables
 load_dotenv()
 api_key = os.environ.get("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key)
+
+# Additional CLI Arguments
+args = sys.argv[2:]
+
+# Chat Persistence Messages
+messages = [
+    types.Content(role="user", parts=[types.Part(text=sys.argv[1])]),
+]
 
 # Error Message Strings
 error_not_a_string = [
@@ -48,26 +57,35 @@ def check_prompt(error, not_string_msg, zero_length_msg):
 
 # Execute the Prompt and Print the Response
 @decorator_function
-def run_prompt(prompt_contents):
+def run_prompt(prompt_contents, cli_args):
     response = client.models.generate_content(
         model='gemini-2.0-flash-001',
         contents=prompt_contents
         )
-    llm_response = [
-        print(response.text),
-        print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}"),
-        print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
-    ]
-    return llm_response[0], llm_response[1], llm_response[2]
+    if "--verbose" in cli_args:
+        llm_response_verbose = [
+            print(f"User prompt: {sys.argv[1]}"),
+            print("-"*75),
+            print(response.text),
+            print("-"*75),
+            print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}"),
+            print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
+        ]
+        return llm_response_verbose
+    else:
+        llm_response = [
+            print(response.text)
+        ]
+        return llm_response
 
 
-def main(check, errormsgfunc, errormsg1, errormsg2, run):
+def main(check, errormsgfunc, errormsg1, errormsg2, run, message_context, cli_args):
     op_code_returned = check(errormsgfunc, errormsg1, errormsg2)
     if op_code_returned != 0:
         exit(1)
     else:
-        run(sys.argv[1])
+        run(message_context, cli_args)
 
 
 if __name__ == "__main__":
-    main(check_prompt, error_message, error_not_a_string, error_invalid_prompt_length, run_prompt)
+    main(check_prompt, error_message, error_not_a_string, error_invalid_prompt_length, run_prompt, messages, args)
