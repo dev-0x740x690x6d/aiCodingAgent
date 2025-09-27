@@ -1,7 +1,8 @@
 import sys
 import os
+from functions.config import ABSOLUTE_DIRECTORY_CONFIG
 
-absolute_directory = '/app/bootDevAIAgent/calculator'
+absolute_directory = ABSOLUTE_DIRECTORY_CONFIG
 
 def get_files_info(working_directory, directory="."):
     if type(working_directory) != str or type(directory) != str:

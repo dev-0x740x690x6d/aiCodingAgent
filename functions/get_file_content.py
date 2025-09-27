@@ -1,8 +1,8 @@
 import sys
 import os
-from functions.config import MAX_CHAR_READ_LIMIT
+from functions.config import *
 
-absolute_directory = '/app/bootDevAIAgent/calculator'
+absolute_directory = ABSOLUTE_DIRECTORY_CONFIG
 
 def get_file_content(working_directory, file_path):
     if type(working_directory) != str or type(file_path) != str:

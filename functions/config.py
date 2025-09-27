@@ -1,1 +1,2 @@
 MAX_CHAR_READ_LIMIT = 10000
+ABSOLUTE_DIRECTORY_CONFIG = '/app/bootDevAIAgent/calculator'
